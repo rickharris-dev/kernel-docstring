@@ -26,13 +26,5 @@ describe "KernelDocString", () ->
       changeHandler.callCount > 0
 
     runs ->
-      expect(editor.getText()).toEqual """
-/**
- * main -
- * @test0:
- * @test1:
- * @test2:
- * Description:
- */
-int main(int **test0, char **test1, char *test2)
-"""
+      test_string = '/**\n * main -\n * @test0:\n * @test1:\n * @test2:\n * Description:\n */\nint main(int **test0, char **test1, char *test2)'
+      expect(editor.getText()).toEqual test_string

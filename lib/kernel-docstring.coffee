@@ -29,7 +29,7 @@ module.exports =
         if parameters.length
           for param in parameters
             editor.insertText(" * @#{param}:\n")
-        editor.insertText(" * Description: \n */\n#{selection}")
+        editor.insertText(" * Description:\n */\n#{selection}")
       else
         editor.insertText("Nope")
         console.log("Error: Function is formatted incorrectly. Check with Betty.")
