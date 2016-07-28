@@ -13,9 +13,6 @@ module.exports =
 
   convert: ->
     if editor = atom.workspace.getActiveTextEditor()
-      function_pattern = /// ^
-
-      ///
       selection = editor.getSelectedText()
       if (/^([\w]+[ ](?=[\*\w])[*]*\w+(?=[(])\([\w*, ]+\))/.test(selection))
         function_name = selection.match(/\w+(?=[(])/)
