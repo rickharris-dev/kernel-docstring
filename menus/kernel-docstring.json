@@ -1,0 +1,26 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Kernel DocString",
+        "command": "kernel-docstring:convert"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "Kernel DocString",
+          "submenu": [
+            {
+              "label": "Convert",
+              "command": "kernel-docstring:convert"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
