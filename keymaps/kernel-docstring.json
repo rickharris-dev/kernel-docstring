@@ -1,5 +1,5 @@
 {
   "atom-workspace": {
-    "ctrl-s": "kernel-docstring:convert"
+    "ctrl-shift-S": "kernel-docstring:convert"
   }
 }
