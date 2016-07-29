@@ -13,19 +13,31 @@ module.exports =
 
   convert: ->
     if editor = atom.workspace.getActiveTextEditor()
+      editor.selectAll()
       selection = editor.getSelectedText()
-      if (/^([\w]+[ ](?=[\*\w])[*]*\w+(?=[(])\([\w*, ]+\))/.test(selection))
-        function_name = selection.match(/\w+(?=[(])/)
-        parameters = selection.match(/\w+(?=[)]|[,])/g)
+      functions = selection.match(/^([\w]+[ ](?=[\*\w])[*]*\w+(?=[(])\([\w*, ]+\))/gm)
+      if functions.length > 0
+        for target in functions
+          test = target.replace /[*]/g, '\\*'
+          test = test.replace /[(]/g, '\\('
+          test = test.replace /[)]/g, '\\)'
+          doc_test = "\\*\\/\\s+" + test
+          doc_test = new RegExp(doc_test,"m")
+          if not doc_test.test(selection)
+            re = new RegExp(test,"m");
+            function_name = target.match(/\w+(?=[(])/)
+            parameters = target.match(/\w+(?=[)]|[,])/g)
+            docstring = "/**\n"
+            if function_name.length
+              for func in function_name
+                docstring += " * #{func} -\n"
 
-        editor.insertText("/**\n")
-        if function_name.length
-          for func in function_name
-            editor.insertText(" * #{func} -\n")
-
-        if parameters.length
-          for param in parameters
-            editor.insertText(" * @#{param}:\n")
-        editor.insertText(" * Description:\n */\n#{selection}")
+            if parameters.length
+              for param in parameters
+                docstring += " * @#{param}:\n"
+            docstring += " * Description:\n */\n#{target}"
+            selection = selection.replace re, docstring
+        console.log(selection)
+        editor.insertText(selection)
       else
         console.log("Error: Function is formatted incorrectly. Check with Betty.")
