@@ -28,5 +28,4 @@ module.exports =
             editor.insertText(" * @#{param}:\n")
         editor.insertText(" * Description:\n */\n#{selection}")
       else
-        editor.insertText("Nope")
         console.log("Error: Function is formatted incorrectly. Check with Betty.")
