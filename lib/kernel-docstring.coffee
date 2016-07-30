@@ -15,13 +15,13 @@ module.exports =
     if editor = atom.workspace.getActiveTextEditor()
       editor.selectAll()
       selection = editor.getSelectedText()
-      functions = selection.match(/^([\w]+[ ](?=[\*\w])[*]*\w+(?=[(])\([\w*, ]+\))/gm)
+      functions = selection.match(/^([\w]+[ ](?=[\*\w])[*]*\w+(?=[(])\([\w*, ]+\))(?![;])/gm)
       if functions.length > 0
         for target in functions
           test = target.replace /[*]/g, '\\*'
           test = test.replace /[(]/g, '\\('
           test = test.replace /[)]/g, '\\)'
-          doc_test = "\\*\\/\\s+" + test
+          doc_test = "\\*\\/\\s+" + test + "(?![;])"
           doc_test = new RegExp(doc_test,"m")
           if not doc_test.test(selection)
             re = new RegExp(test,"m");

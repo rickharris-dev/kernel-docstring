@@ -28,9 +28,11 @@ describe "KernelDocString", () ->
     runs ->
       test_string = '/**\n * main -\n * @test0:\n * @test1:\n * @test2:\n * Description:\n */\nint main(int **test0, char **test1, char *test2)'
       expect(editor.getText()).toEqual test_string
-  it 'updates all functions in the file', ->
+  it 'updates all functions in the file and ignores prototypes', ->
     editor = atom.workspace.getActiveTextEditor()
-    editor.insertText("""void ntree_free(NTree *tree)
+    editor.insertText("""int test(char *test);
+
+void ntree_free(NTree *tree)
 {
 
 }
@@ -64,5 +66,5 @@ int path_exists(NTree *tree, char **path)
       changeHandler.callCount > 0
 
     runs ->
-      test_string = '/**\n * ntree_free -\n * @tree:\n * Description:\n */\nvoid ntree_free(NTree *tree)\n{\n\n}\n\n/**\n * ntree_insert -\n * @tree:\n * @parents:\n * @data:\n * Description:\n */\nint ntree_insert(NTree **tree, char **parents, char *data)\n{\n\n}\n\n/**\n * path_exists -\n * @tree:\n * @path:\n * Description:\n */\nint path_exists(NTree *tree, char **path)\n{\n\n}'
+      test_string = 'int test(char *test);\n\n/**\n * ntree_free -\n * @tree:\n * Description:\n */\nvoid ntree_free(NTree *tree)\n{\n\n}\n\n/**\n * ntree_insert -\n * @tree:\n * @parents:\n * @data:\n * Description:\n */\nint ntree_insert(NTree **tree, char **parents, char *data)\n{\n\n}\n\n/**\n * path_exists -\n * @tree:\n * @path:\n * Description:\n */\nint path_exists(NTree *tree, char **path)\n{\n\n}'
       expect(editor.getText()).toEqual test_string
