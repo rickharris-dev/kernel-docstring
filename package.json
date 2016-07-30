@@ -1,7 +1,7 @@
 {
   "name": "kernel-docstring",
   "main": "./lib/kernel-docstring",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Creates a kernel-style docstring for a C function",
   "keywords": [],
   "activationCommands": {
