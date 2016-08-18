@@ -15,7 +15,7 @@ module.exports =
     if editor = atom.workspace.getActiveTextEditor()
       editor.selectAll()
       selection = editor.getSelectedText()
-      functions = selection.match(/^([\w]+[ ](?=[\*\w])[*]*\w+(?=[(])\([\w*, ]+\))(?![;])/gm)
+      functions = selection.match(/^((?:(?:static|inline)\s)?[\w]+[ ](?=[\*\w])[*]*\w+(?=[(])\([\w*, ]+\))(?![;])/gm)
       if functions.length > 0
         for target in functions
           test = target.replace /[*]/g, '\\*'
