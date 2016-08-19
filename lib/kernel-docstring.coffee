@@ -26,7 +26,7 @@ module.exports =
           if not doc_test.test(selection)
             re = new RegExp(test,"m");
             function_name = target.match(/\w+(?=[(])/)
-            parameters = target.match(/\w+(?=[)]|[,])/g)
+            parameters = target.match(/(?<=\w\s)\w+(?=\s*\)|\s*,\s*)/g)
             docstring = "/**\n"
             if function_name.length
               for func in function_name
