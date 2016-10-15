@@ -1,46 +1,73 @@
 {CompositeDisposable} = require 'atom'
 
 module.exports =
-  subscriptions: null
+    subscriptions: null
 
-  activate: ->
-    @subscriptions = new CompositeDisposable
-    @subscriptions.add atom.commands.add 'atom-workspace',
-      'kernel-docstring:convert': => @convert()
+    activate: ->
+        @subscriptions = new CompositeDisposable
+        @subscriptions.add atom.commands.add 'atom-workspace',
+            'kernel-docstring:convert': => @convert()
 
-  deactivate: ->
-    @subscriptions.dispose()
+    deactivate: ->
+        @subscriptions.dispose()
 
-  convert: ->
-    if editor = atom.workspace.getActiveTextEditor()
-      editor.selectAll()
-      selection = editor.getSelectedText()
-      functions = selection.match(/^((?:(?:static|inline)\s*)?[\w]+[ ](?=[\*\w])[*]*\w+(?=[(])\([\w*, ]+\))(?![;])/gm)
-      if functions.length > 0
-        for target in functions
-          test = target.replace /[*]/g, '\\*'
-          test = test.replace /[(]/g, '\\('
-          test = test.replace /[)]/g, '\\)'
-          doc_test = "\\*\\/\\s+" + test + "(?![;])"
-          doc_test = new RegExp(doc_test,"m")
-          if not doc_test.test(selection)
-            re = new RegExp(test,"m");
-            function_name = target.match(/\w+(?=[(])/)
-            parameters = target.match(/(?<=\w\s|(?:\*))\w+(?=\s*\)|\s*,\s*)/g)
-            return_type = target.match(/\w*(?:\s+\*+|\b(?=\s))(?=\s*\w*\(.*\))/)
-            docstring = "/**\n"
-            if function_name.length
-              for func in function_name
-                docstring += " * #{func} -\n"
-            if parameters && parameters.length
-              for param in parameters
-                docstring += " * @#{param}:\n"
-            docstring += " * Description:\n"
-            if (return_type[0] != "void")
-              docstring += " * Return:\n"
-             docstring += "*/\n#{target}"
-            selection = selection.replace re, docstring
-        console.log(selection)
-        editor.insertText(selection)
-      else
-        console.log("Error: Function is formatted incorrectly. Check with Betty.")
+    docstring: (func_match) ->
+        new_value = ['/**']
+        func_match = func_match.split '('.split ' '
+        console.log func_match
+
+    convert: ->
+        docstring = (func_match) ->
+            name_pattern = ///
+                \w+     # Finds words of any length
+                (?=[(]) # Finds start of params section
+                ///
+
+            return_pattern = ///
+                \w+         # Return value
+                (?=\s\w+\() # Before function name
+                ///
+
+            params_pattern = ///
+                \w+                 # Param name
+                (?=\s?[)]|\s?[,])   # Checks for , or ) at end of param
+                ///g
+
+            new_value = ['/**']
+            line_start = ' * '
+            end_string = ' */'
+            name = func_match.match name_pattern
+            return_type = func_match.match return_pattern
+            console.log return_type
+            params = func_match.match params_pattern
+
+            new_value.push [line_start, name, ' -'].join ''
+            for param in params
+                new_value.push [line_start, '@', param, ':'].join ''
+            new_value.push [line_start, 'Description:'].join ''
+            if return_type[0] != 'void'
+                new_value.push [line_start, 'Return:'].join ''
+            new_value.push end_string, func_match
+            return new_value.join '\n'
+
+        function_pattern = /// ^
+            (                         # Start capture group
+            (?:static\s|inline\s)?    # Accounts for static or inline at front
+            [\w]+[\ ]                 # Checks for return value
+            [*]*                      # Accounts for pointer return value
+            \w+                       # Function name
+            \([\w*,\ ]+\)             # Argument range between ( and )
+            )                         # End capture group
+            (?![;])                   # Confirms it is not a prototype
+            $ ///
+        if editor = atom.workspace.getActiveTextEditor()
+            editor.selectAll()
+            selection = editor.getSelectedText().split '\n'
+            i = 0
+            while i < selection.length
+                if selection[i].match function_pattern
+                    if selection[i - 1] != ' */'
+                        selection[i] = docstring(selection[i])
+                        console.log selection[i]
+                i++
+            editor.insertText(selection.join '\n')
